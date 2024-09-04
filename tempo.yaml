@@ -1,0 +1,30 @@
+server:
+  http_listen_port: 3200
+  log_level: debug
+
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo
+  storage:
+    path: /tmp/tempo/generator_wals
+
+ingester:
+  max_block_duration: 5m
+  trace_idle_period: 10s
+  lifecycler:
+    ring:
+      replication_factor: 1
+
+compactor:
+  compaction:
+    compaction_window: 1h
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /tmp/tempo/blocks
+
+overrides:
+  metrics_generator_processors: [service-graphs, span-metrics]
