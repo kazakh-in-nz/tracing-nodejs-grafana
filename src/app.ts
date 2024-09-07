@@ -2,36 +2,88 @@ import "./tracing";
 import { trace } from "@opentelemetry/api";
 import express = require("express");
 import { Request, Response } from "express";
+import { BasicMockClass } from "./basic_mock";
+import { resolve } from "path";
 
 const tracer = trace.getTracer("basic-tracer-node");
 
 const app = express();
 
-// Sample GET endpoint
-app.get("/hello", async (req: Request, res: Response) => {
+app.get("/instant_hello", async (req: Request, res: Response) => {
   // Start a span for this request
   const span = tracer.startSpan("GET /hello");
+  const mockClass = new BasicMockClass();
 
   try {
-    // Set attributes and events on the span
-    span.setAttribute("custom-attribute", "custom-attribute-value");
     span.addEvent("Start processing request", { timestamp: Date.now() });
 
-    res.send("Hello, World!");
-
-    console.log("Sleeping for 1 second...", new Date().toLocaleTimeString());
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log("Slept for 1 second", new Date().toLocaleTimeString());
-
-    // End the span after all operations are complete
-    span.end();
+    res.send(mockClass.getInstantResponse());
   } catch (error) {
     // Record any exception that occurs
     if (error instanceof Error) {
       span.recordException(error);
     }
-    span.end();
+
     throw error;
+  } finally {
+    span.end();
+  }
+});
+
+app.get("/hello", async (req: Request, res: Response) => {
+  // Start a span for this request
+  const span = tracer.startSpan("GET /hello");
+  const mockClass = new BasicMockClass();
+
+  const afterSecondsParam = req.query.after_seconds ?? "1";
+
+  if (isNaN(Number(afterSecondsParam))) {
+    res.status(400).send("Invalid after_seconds parameter");
+    return;
+  }
+
+  try {
+    span.addEvent("Start processing request", { timestamp: Date.now() });
+
+    res.send(
+      await mockClass.getResponseAfterTimeout(
+        Math.min(10, Number(afterSecondsParam))
+      )
+    );
+  } catch (error) {
+    // Record any exception that occurs
+    if (error instanceof Error) {
+      span.recordException(error);
+    }
+
+    throw error;
+  } finally {
+    span.end();
+  }
+});
+
+app.get("/error", async (req: Request, res: Response) => {
+  // Start a span for this request
+  const span = tracer.startSpan("GET /error");
+  const mockClass = new BasicMockClass();
+
+  try {
+    span.addEvent("Start processing request", { timestamp: Date.now() });
+
+    await new Promise<void>(resolve => {
+      setTimeout(() => resolve(), 1000);
+    });
+
+    res.status(500).send("Internal server error");
+  } catch (error) {
+    // Record any exception that occurs
+    if (error instanceof Error) {
+      span.recordException(error);
+    }
+
+    throw error;
+  } finally {
+    span.end();
   }
 });
 
