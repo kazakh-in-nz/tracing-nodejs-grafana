@@ -1,0 +1,89 @@
+{
+  "rabbit_version": "3.11",
+  "parameters": [],
+  "policies": [],
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "anSapqbrNiocn51McZKjttevVnX7y2XksVu2EIOlB8+qTQGK",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "queues": [
+    {
+      "name": "basic-tracing",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "basic-tracing-dlx",
+        "x-dead-letter-routing-key": "basic-tracing.dlq",
+        "x-message-ttl": 3600000,
+        "x-queue-type": "quorum"
+      }
+    },
+    {
+      "name": "basic-tracing.dlq",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum"
+      }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "basic-tracing",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "basic-tracing-dlx",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "basic-tracing",
+      "vhost": "/",
+      "destination": "basic-tracing",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    },
+    {
+      "source": "basic-tracing-dlx",
+      "vhost": "/",
+      "destination": "basic-tracing.dlq",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    }
+  ]
+}

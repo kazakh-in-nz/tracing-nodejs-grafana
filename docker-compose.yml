@@ -46,3 +46,12 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
     ports:
       - "3003:3000"
+
+  rabbitmq:
+    image: rabbitmq:3.11-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./conf/rabbitmq.definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./conf/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro

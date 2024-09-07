@@ -11,7 +11,11 @@ const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter({
     url: "http://tempo:4317/v1/traces" // Ensure this matches your Tempo endpoint
   }),
-  instrumentations: [getNodeAutoInstrumentations()]
+  instrumentations: [
+    getNodeAutoInstrumentations({
+      "@opentelemetry/instrumentation-fs": { requireParentSpan: true }
+    })
+  ]
 });
 
 async function initializeTracing() {
