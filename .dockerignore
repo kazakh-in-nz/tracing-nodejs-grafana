@@ -1,0 +1,21 @@
+# Environment files
+.env
+.env.example
+
+# Configuration files
+conf
+tempo.yaml
+tsconfig.json
+
+# Build and distribution directories
+dist
+tmp
+
+# Dependency directories
+node_modules
+
+# Git files
+.gitignore
+
+# Grafana files
+grafana-*

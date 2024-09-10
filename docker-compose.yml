@@ -5,6 +5,15 @@ services:
       - "3000:3000"
     depends_on:
       - tempo
+      - rabbitmq
+    env_file:
+      - .env
+    command:
+      [
+        "sh",
+        "-c",
+        "while ! nc -z rabbitmq 5672; do sleep 1; done; node --require ./tracing.js app.js"
+      ]
 
   tempo:
     image: grafana/tempo:2.1.1

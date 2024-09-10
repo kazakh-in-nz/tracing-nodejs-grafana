@@ -2,7 +2,7 @@
   "name": "gpt-example",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/app.ts",
@@ -23,10 +23,13 @@
     "@opentelemetry/semantic-conventions": "^1.27.0",
     "@types/express": "^4.17.21",
     "@types/node": "^22.5.2",
+    "amqplib": "^0.10.4",
+    "chalk": "^4.1.2",
     "express": "^4.19.2",
     "typescript": "^5.5.4"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.5",
     "ts-node": "^10.9.2"
   }
 }
